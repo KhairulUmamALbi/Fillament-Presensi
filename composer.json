@@ -6,6 +6,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "bezhansalleh/filament-shield": "^3.3",
+        "blade-ui-kit/blade-heroicons": "*",
+        "filament/filament": "^3.2",
+        "humaidem/filament-map-picker": "^0.1.5",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9"
     },
@@ -33,7 +37,8 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
