@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OfficesResource\Pages;
-use App\Filament\Resources\OfficesResource\RelationManagers;
 use App\Models\Offices;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,58 +10,76 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Humaidem\FilamentMapPicker\Fields\OSMMap;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class OfficesResource extends Resource
 {
     protected static ?string $model = Offices::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
+
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                    OSMMap::make('location')
-                    ->label('Location')
-                    ->showMarker()
-                    ->draggable()
-                    ->extraControl([
-                        'zoomDelta'           => 1,
-                        'zoomSnap'            => 0.25,
-                        'wheelPxPerZoomLevel' => 60
-                    ])
-                    ->afterStateHydrated(function (Forms\Get $get, Forms\Set $set, $record) {
-                        $latitude = $record->latitude;
-                        $longitude = $record->longitude;
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(255),
+                                OSMMap::make('location')
+                                    ->label('Location')
+                                    ->showMarker()
+                                    ->draggable()
+                                    ->extraControl([
+                                        'zoomDelta' => 1,
+                                        'zoomSnap' => 0.25,
+                                        'wheelPxPerZoomLevel' => 60,
+                                    ])
+                                    ->afterStateHydrated(function (Forms\Get $get, Forms\Set $set, $record) {
+                                        $latitude = $record->latitude;
+                                        $longitude = $record->longitude;
 
-                        if ($latitude && $longitude) {
-                            $set('location', [
-                                'latitude'  => $latitude,
-                                'longitude' => $longitude,
-                            ]);
-                        }
-                    })
-                    ->afterStateUpdated(function ($state,Forms\Get $get, Forms\Set $set) {
-                        $set('latitude', $state['lat']);
-                        $set('longitude', $state['lng']);
-                    })
+                                        if ($latitude && $longitude) {
+                                            $set('location', [
+                                                'latitude' => $latitude,
+                                                'longitude' => $longitude,
+                                            ]);
+                                        }
+                                    })
+                                    ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                                        $set('latitude', $state['lat']);
+                                        $set('longitude', $state['lng']);
+                                    })
 
-                    // tiles url (refer to https://www.spatialbias.com/2018/02/qgis-3.0-xyz-tile-layers/)
-                    ->tilesUrl('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'),
-                Forms\Components\TextInput::make('latitude')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('longitude')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('radius')
-                    ->required()
-                    ->maxLength(255),
+                                    // tiles url (refer to https://www.spatialbias.com/2018/02/qgis-3.0-xyz-tile-layers/)
+                                    ->tilesUrl('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'),
+                                Forms\Components\Group::make()
+                                    ->schema([
+                                        Forms\Components\TextInput::make('latitude')
+                                            ->required()
+                                            ->numeric(),
+                                        Forms\Components\TextInput::make('longitude')
+                                            ->required()
+                                            ->numeric(),
+
+                                    ])->columns(2),
+
+                            ]),
+                    ]),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('radius')
+                                    ->required()
+                                    ->maxLength(255),
+
+                            ]),
+                    ]),
             ]);
     }
 

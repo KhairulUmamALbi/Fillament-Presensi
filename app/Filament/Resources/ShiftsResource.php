@@ -3,34 +3,40 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ShiftsResource\Pages;
-use App\Filament\Resources\ShiftsResource\RelationManagers;
 use App\Models\Shifts;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ShiftsResource extends Resource
 {
     protected static ?string $model = Shifts::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-m-clipboard-document-list';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TimePicker::make('start_time')
-                    ->required(),
-                Forms\Components\TimePicker::make('end_time')
-                    ->required(),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TimePicker::make('start_time')
+                                    ->required(),
+                                Forms\Components\TimePicker::make('end_time')
+                                    ->required(),
+                            ]),
+                    ]),
             ]);
+
     }
 
     public static function table(Table $table): Table

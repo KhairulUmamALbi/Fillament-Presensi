@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 
 class schedules extends Model
 {
@@ -13,7 +12,7 @@ class schedules extends Model
 
     protected $fillable = [
         'user_id',
-        'shift_id',
+        'shifts_id',
         // 'office_id',
         // 'latitude',
         // 'longitude',
@@ -22,22 +21,23 @@ class schedules extends Model
         // 'schedule_start_time',
         // 'schedule_end_time',
         // 'start_time',
-        'office_id',
+        'is_wfa',
+        'offices_id',
         'end_time',
     ];
 
     //
-    public function user() : BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function shifts() : BelongsTo
+    public function shifts(): BelongsTo
     {
         return $this->belongsTo(shifts::class);
     }
 
-    public function offices() : BelongsTo
+    public function offices(): BelongsTo
     {
         return $this->belongsTo(offices::class);
     }
