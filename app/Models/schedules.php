@@ -5,25 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Permission\Traits\HasRoles;
 
 class schedules extends Model
 {
-    use HasFactory;
+    use HasFactory, HasRoles;
+
+    protected $casts = [
+        'is_wfa' => 'boolean',
+        'is_banned' => 'boolean',
+    ];
 
     protected $fillable = [
         'user_id',
         'shifts_id',
-        // 'office_id',
-        // 'latitude',
-        // 'longitude',
-        // 'schedule_latitude',
-        // 'schedule_longitude',
-        // 'schedule_start_time',
-        // 'schedule_end_time',
-        // 'start_time',
         'is_wfa',
         'offices_id',
         'end_time',
+        'is_banned',
     ];
 
     //

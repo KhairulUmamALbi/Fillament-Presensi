@@ -12,13 +12,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
+
 class SchedulesResource extends Resource
 {
     protected static ?string $model = Schedules::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-date-range';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 7;
+    protected static ?string $navigationGroup = 'Attedance Management';
 
     public static function form(Form $form): Form
     {
@@ -39,6 +41,7 @@ class SchedulesResource extends Resource
                                     ->relationship('offices', 'name')
                                     ->required(),
                                 Forms\Components\Toggle::make('is_wfa'),
+                                Forms\Components\Toggle::make('is_banned'),
                             ]),
                     ]),
             ]);
@@ -63,9 +66,14 @@ class SchedulesResource extends Resource
                 Tables\Columns\TextColumn::make('user.email')
                     ->label('Email')
                     ->sortable(),
-
-                Tables\Columns\BooleanColumn::make('is_wfa')
-                    ->label('WFA'),
+                Tables\Columns\ToggleColumn::make('is_banned')
+                    ->label('Banned')
+                    ->hidden(fn () => !Auth::user()->hasRole('super_admin')),
+                // Tables\Columns\BooleanColumn::make('is_wfa')
+                //     ->label('WFA'),
+                Tables\Columns\IconColumn::make('is_wfa')
+                    ->label('WFA')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('shifts.name')
                     ->description(fn (Schedules $record) => $record->shifts->start_time.' - '.$record->shifts->end_time)
                     ->sortable(),
