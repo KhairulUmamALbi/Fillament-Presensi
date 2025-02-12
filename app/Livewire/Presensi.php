@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\attendances;
 use App\Models\schedules;
+use App\Models\Leave;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -38,6 +39,18 @@ class Presensi extends Component
         ]);
 
         $schedules = Schedules::where('user_id', Auth::user()->id)->first();
+        // block user if Cuti
+        $today = Carbon::today()->format('Y-m-d');
+        $approvedLeave = Leave::where('user_id',Auth::user()->id)
+        ->where('status','approved')
+        ->where('start_date','<=',$today)
+        ->where('end_date','>=',$today)
+        ->exists();
+
+        if($approvedLeave){
+            session()->flash('error', 'Anda sedang cuti');
+            return;
+        }
 
         if ($schedules) {
             $attendances = Attendances::where('user_id', Auth::user()->id)
@@ -50,23 +63,23 @@ class Presensi extends Component
                     'schedule_longitude' => $schedules->offices->longitude,
                     'schedule_start_time' => $schedules->shifts->start_time,
                     'schedule_end_time' => $schedules->shifts->end_time,
-                    'latitude' => $this->latitude,
-                    'longitude' => $this->longitude,
+                    'start_latitude' => $this->latitude,
+                    'start_longitude' => $this->longitude,
                     'start_time' => carbon::now()->toTimeString(),
                     'end_time' => carbon::now()->toTimeString(),
                 ]);
             } else {
                 $attendances->update([
-                    'latitude' => $this->latitude,
-                    'longitude' => $this->longitude,
+                    'end_latitude' => $this->latitude,
+                    'end_longitude' => $this->longitude,
                     'end_time' => carbon::now()->toTimeString(),
                 ]);
             }
-
-            return redirect()->route('presensi', [
-                'latitude' => $this->latitude,
-                'insideRadius' => false,
-            ]);
+            return redirect('admin/attendances');
+            // return redirect()->route('presensi', [
+            //     'latitude' => $this->latitude,
+            //     'insideRadius' => false,
+            // ]);
         }
 
     }

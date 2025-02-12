@@ -9,16 +9,21 @@
                         <p><strong>Kantor</strong> {{ $schedules->offices->name }} </p>
                         <p><strong>Shift</strong> {{ $schedules->shifts->name }} ({{ $schedules->shifts->start_time }} -
                             {{ $schedules->shifts->end_time }})</p>
+                        @if ($schedules->is_wfa)
+                        <p class="text-green-500"><strong>Status : WFA </strong></p>
+                        @else
+                        <p><strong>Status : WFO </strong></p>
+                        @endif
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
                         <div class="bg-gray-100 p-1 rounded-lg">
-                            <h4 class="text-l font-bold mb-2">Jam Masuk</h4>
-                            <p><strong>{{ $attendances->start_time }}</strong></p>
+                            <h4 class="text-l font-bold mb-2">Waktu Datang</h4>
+                            <p><strong>{{ $attendances ? $attendances->start_time : '-'}}</strong></p>
                         </div>
 
                         <div class="bg-gray-100 p-1 rounded-lg">
-                            <h4 class="text-l font-bold mb-2">Jam Pulang</h4>
-                            <p><strong>{{ $attendances->end_time }}</strong></p>
+                            <h4 class="text-l font-bold mb-2">Waktu Pulang</h4>
+                            <p><strong>{{ $attendances ? $attendances->end_time : '-' }}</strong></p>
                         </div>
 
                     </div>
@@ -26,8 +31,12 @@
                 <div class="">
                     <h2 class="text-2xl font-bold mb-2">Presensi</h2>
                     <div id="map" class="mb-4 rounded-lg border border-gray-300" wire:ignore></div>
-
-                    <form class="row g-3" wire:submit='store' enctype="multipart/form-data">
+                    @if (session()->has('error'))
+                    <div class="bg-red-500 text-white p-2 rounded-lg">
+                        {{ session('error') }}
+                    </div>
+                    @endif
+                    <form class="row g-3 mt-3" wire:submit='store' enctype="multipart/form-data">
                         <button type="button" onclick="tagLocation()"
                             class="px-4 py-2 bg-blue-500 text-white rounded">Tag
                             Location</button>
@@ -92,8 +101,6 @@
                         component.set('latitude', lat);
                         component.set('longitude', lng);
                         alert('You are in the radius');
-                    } else {
-                        alert('You are not in the radius');
                     }
                 });
             } else {
@@ -102,8 +109,15 @@
         }
 
         function isWithRadius(lat, lng, center, radius) {
-            let distance = map.distance([lat, lng], center);
-            return distance <= radius;
+
+            const is_wfa = {{ $schedules->is_wfa }};
+            if (is_wfa) {
+                return true;
+            }else{
+                let distance = map.distance([lat, lng], center);
+                return distance <= radius;
+            }
+
         }
     </script>
 </div>

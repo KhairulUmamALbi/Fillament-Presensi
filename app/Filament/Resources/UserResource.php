@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -16,8 +17,8 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-s-user-group';
-
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup = 'User Management';
 
     public static function form(Form $form): Form
     {
@@ -38,6 +39,8 @@ class UserResource extends Resource
                                     ->relationship('roles', 'name')
                                     ->preload()
                                     ->searchable(),
+                                Forms\Components\FileUpload::Make('image')
+
                             ]),
                     ]),
 
@@ -45,7 +48,6 @@ class UserResource extends Resource
                     ->schema([
                         Forms\Components\Section::make()
                             ->schema([
-
                                 Forms\Components\DateTimePicker::make('email_verified_at'),
                                 Forms\Components\TextInput::make('password')
                                     ->password()
@@ -53,7 +55,6 @@ class UserResource extends Resource
                                     ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                                     ->dehydrated(fn ($state) => filled($state))
                                     ->required(fn (string $context): bool => $context === 'create'),
-
                             ]),
                     ]),
             ]);
@@ -64,6 +65,9 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Avatar')
+                    ->circular(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')

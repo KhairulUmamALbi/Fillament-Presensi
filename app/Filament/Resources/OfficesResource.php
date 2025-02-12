@@ -17,7 +17,8 @@ class OfficesResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 5;
+    protected static ?string $navigationGroup = 'Office Management';
 
     public static function form(Form $form): Form
     {
@@ -40,15 +41,17 @@ class OfficesResource extends Resource
                                         'wheelPxPerZoomLevel' => 60,
                                     ])
                                     ->afterStateHydrated(function (Forms\Get $get, Forms\Set $set, $record) {
-                                        $latitude = $record->latitude;
-                                        $longitude = $record->longitude;
-
-                                        if ($latitude && $longitude) {
-                                            $set('location', [
-                                                'latitude' => $latitude,
-                                                'longitude' => $longitude,
-                                            ]);
+                                        if($record){
+                                            $latitude = $record->latitude;
+                                            $longitude = $record->longitude;
+                                            if ($latitude && $longitude) {
+                                                $set('location', [
+                                                    'latitude' => $latitude,
+                                                    'longitude' => $longitude,
+                                                ]);
+                                            }
                                         }
+
                                     })
                                     ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
                                         $set('latitude', $state['lat']);
